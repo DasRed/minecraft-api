@@ -1,7 +1,6 @@
 package com.dasred.minecraft_api.api.handler;
 
 import com.dasred.minecraft_api.api.HandlerInterface;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.server.MinecraftServer;
@@ -15,7 +14,7 @@ public class PlayersHandler implements HandlerInterface {
         JsonObject jsonResponse = new JsonObject();
         jsonResponse.addProperty("max", mcServer.getMaxPlayers());
 
-        JsonArray jsonPlayers = new JsonArray();
+        JsonObject jsonPlayers = new JsonObject();
         for (ServerPlayer player : mcServer.getPlayerList().getPlayers()) {
             JsonObject jsonPlayer = new JsonObject();
             jsonPlayer.addProperty("uuid", player.getStringUUID());
@@ -35,7 +34,7 @@ public class PlayersHandler implements HandlerInterface {
             jsonPlayer.addProperty("gameModeName", player.gameMode.getGameModeForPlayer().getName());
             jsonPlayer.addProperty("isInvisible", player.isInvisible());
             jsonPlayer.addProperty("experienceLevel", player.experienceLevel);
-            jsonPlayers.add(jsonPlayer);
+            jsonPlayers.add(player.getStringUUID(), jsonPlayer);
         }
 
         jsonResponse.add("players", jsonPlayers);

@@ -4,11 +4,14 @@ import com.dasred.minecraft_api.api.HandlerInterface;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
+import org.jetbrains.annotations.NotNull;
 
 public class EntitiesHandler implements HandlerInterface {
     public JsonElement createJsonResponse(MinecraftServer mcServer) {
@@ -18,42 +21,65 @@ public class EntitiesHandler implements HandlerInterface {
             String dimensionId = level.dimension().location().toString();
 
             for (Entity entity : level.getEntities().getAll()) {
-                JsonObject obj = new JsonObject();
-                obj.addProperty("uuid", entity.getStringUUID());
-                obj.addProperty("type", entity.getType().builtInRegistryHolder().key().location().toString());
-                obj.addProperty("category", entity instanceof ItemEntity ? "item" : entity.getType().getCategory().getName());
-                obj.addProperty("name", entity.getType().getDescription().getString());
-                obj.addProperty("customName", entity.getCustomName() == null ? null : entity.getCustomName().getString());
-                obj.addProperty("dimension", dimensionId);
-                obj.addProperty("x", entity.getX());
-                obj.addProperty("y", entity.getY());
-                obj.addProperty("z", entity.getZ());
-                obj.addProperty("onGround", entity.onGround());
+                JsonObject objEntity = new JsonObject();
+                objEntity.addProperty("uuid", entity.getStringUUID());
+                objEntity.addProperty("type", entity.getType().builtInRegistryHolder().key().location().toString());
+                objEntity.addProperty("category", entity instanceof ItemEntity ? "item" : entity.getType().getCategory().getName());
+                objEntity.addProperty("name", entity.getType().getDescription().getString());
+                objEntity.addProperty("customName", entity.getCustomName() == null ? null : entity.getCustomName().getString());
+                objEntity.addProperty("dimension", dimensionId);
+                objEntity.addProperty("x", entity.getX());
+                objEntity.addProperty("y", entity.getY());
+                objEntity.addProperty("z", entity.getZ());
 
-                obj.addProperty("chunkLoaded", level.isLoaded(entity.blockPosition()));
+                objEntity.add("born", getNBTDataBorn(entity, level));
+                objEntity.add("tags", getTags(entity));
+                objEntity.add("chunk", ChunksActiveHandler.getJsonForChunk(new ChunkPos(entity.blockPosition()), level));
 
                 if (entity instanceof ItemEntity) {
-                    JsonObject objItem = new JsonObject();
-                    ItemStack itemStack = ((ItemEntity) entity).getItem();
-                    objItem.addProperty("name", itemStack.getItem().getName().getString());
-                    objItem.addProperty("type", itemStack.getItem().builtInRegistryHolder().key().location().toString());
-                    objItem.addProperty("age", ((ItemEntity) entity).getAge());
-                    objItem.addProperty("lifespan", ((ItemEntity) entity).lifespan);
-                    objItem.addProperty("count", itemStack.getCount());
-                    objItem.addProperty("popTime", itemStack.getPopTime());
-                    obj.add("item", objItem);
+                    objEntity.add("item", getJsonForItem(((ItemEntity) entity).getItem()));
                 }
 
-                JsonArray tags = new JsonArray();
-                for (String tag : entity.getTags()) {
-                    tags.add(tag);
-                }
-                obj.add("tags", tags);
-
-                arr.add(obj);
+                arr.add(objEntity);
             }
         }
 
         return arr;
+    }
+
+    private static @NotNull JsonElement getTags(Entity entity) {
+        JsonArray tags = new JsonArray();
+        for (String tag : entity.getTags()) {
+            tags.add(tag);
+        }
+
+        return tags;
+    }
+
+    private static @NotNull JsonElement getJsonForItem(ItemStack itemStack) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("name", itemStack.getItem().getName().getString());
+        obj.addProperty("type", itemStack.getItem().builtInRegistryHolder().key().location().toString());
+        obj.addProperty("count", itemStack.getCount());
+
+        return obj;
+    }
+
+    private static JsonElement getNBTDataBorn(Entity entity, ServerLevel level) {
+        CompoundTag root = entity.getPersistentData();
+        CompoundTag api = root.getCompoundOrEmpty("minecraft_api");
+
+        CompoundTag born = api.getCompoundOrEmpty("born");
+        long bornTimestamp = born.getLongOr("timestamp", System.currentTimeMillis());
+        long bornGametime = born.getLongOr("gameTime", level.getGameTime());
+
+        JsonObject jsonAt = new JsonObject();
+        jsonAt.addProperty("timestamp", bornTimestamp);
+        jsonAt.addProperty("gameTime", bornGametime);
+
+        JsonObject result = new JsonObject();
+        result.add("at", jsonAt);
+
+        return result;
     }
 }
