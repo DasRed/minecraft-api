@@ -1,6 +1,6 @@
 ---
 title: Overview
-description: NeoForge mod that serves the players, dimensions, loaded chunks and entities of a Minecraft server as JSON over HTTP.
+description: NeoForge mod that serves the players, dimensions, loaded chunks and entities of a Minecraft server as JSON over HTTP. Compatibility, status and next steps.
 order: 0
 section: Getting started
 ---

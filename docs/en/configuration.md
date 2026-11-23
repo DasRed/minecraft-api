@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Set the port of the HTTP API and keep access within your own network.
+description: The server config of minecraft-api with the port of the HTTP API, and how to restrict access to your own network because the API has no authentication.
 order: 20
 slug: configuration
 section: Setup

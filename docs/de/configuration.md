@@ -1,6 +1,6 @@
 ---
 title: Konfiguration
-description: Port der HTTP-API einstellen und den Zugriff auf das eigene Netz beschränken.
+description: Die Server-Konfiguration von minecraft-api mit dem Port der HTTP-API und wie du den Zugriff auf dein Netz beschränkst, denn die API kennt keine Anmeldung.
 order: 20
 slug: konfiguration
 section: Einrichtung

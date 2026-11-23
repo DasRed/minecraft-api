@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: minecraft-api als JAR herunterladen oder selbst bauen und in den mods-Ordner des Servers legen.
+description: minecraft-api für einen Minecraft-Server 1.21.8 mit NeoForge und Java 21 als JAR herunterladen oder selbst bauen, in den mods-Ordner legen und prüfen.
 order: 10
 section: Einstieg
 ---

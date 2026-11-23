@@ -1,6 +1,6 @@
 ---
 title: HTTP API
-description: All endpoints of minecraft-api with fields and example responses – players, dimensions, entities and loaded chunks.
+description: All HTTP endpoints of minecraft-api with fields and example JSON responses, for players, dimensions, entities and the loaded chunks of your Minecraft server.
 order: 30
 slug: api
 section: Usage
